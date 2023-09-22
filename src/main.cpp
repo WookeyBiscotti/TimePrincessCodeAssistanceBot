@@ -49,14 +49,14 @@ int main(int, char**) {
 		}
 
 		if (!msg->from) {
-			bot.getApi().sendMessage(msg->chat->id, "Несуществующий пользователь");
+			bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь");
 			std::cerr << "Несуществующий пользователь" << std::endl;
 			return;
 		}
 
 		auto userId = msg->from->id;
 		if (ADMINS.count(userId) == 0) {
-			auto m = fmt::format("У вас({}({} {}): {}) нет доступа к этой команде", msg->from->username,
+			auto m = fmt::format("⚠️ У вас({}({} {}): {}) нет доступа к этой команде", msg->from->username,
 			    msg->from->firstName, msg->from->lastName, msg->from->id);
 
 			bot.getApi().sendMessage(msg->chat->id, m);
@@ -70,14 +70,14 @@ int main(int, char**) {
 		    iggid.end());
 
 		if (iggid.empty()) {
-			bot.getApi().sendMessage(msg->chat->id, "Нельзя добавить пустого пользователя");
+			bot.getApi().sendMessage(msg->chat->id, "⚠️ Нельзя добавить пустого пользователя!");
 			return;
 		}
 
 		up::vm_store_record(db).store_or_throw("iggid", up::value::object{{"id", iggid}});
 
 		bot.getApi().sendMessage(msg->chat->id, "Пользователь добавлен");
-		std::cout << "Пользователь добавлен" << std::endl;
+		std::cout << "✅ Пользователь добавлен" << std::endl;
 	});
 
 	bot.getEvents().onCommand("code", [&](TgBot::Message::Ptr msg) {
@@ -87,7 +87,7 @@ int main(int, char**) {
 		}
 
 		if (!msg->from) {
-			bot.getApi().sendMessage(msg->chat->id, "Несуществующий пользователь");
+			bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь");
 			std::cerr << "Несуществующий пользователь" << std::endl;
 			return;
 		}
@@ -97,7 +97,7 @@ int main(int, char**) {
 		    code.end());
 
 		if (code.empty()) {
-			bot.getApi().sendMessage(msg->chat->id, "Нельзя добавить пустой код");
+			bot.getApi().sendMessage(msg->chat->id, "⚠️ Нельзя добавить пустой код!");
 			return;
 		}
 
@@ -109,7 +109,8 @@ int main(int, char**) {
 
 		up::value value = up::vm_fetch_all_records(db).fetch_value_or_throw("iggid");
 
-		bot.getApi().sendMessage(msg->chat->id, fmt::format("Старт активации", stats.totalActivates, stats.totalUsers));
+		bot.getApi().sendMessage(msg->chat->id,
+		    fmt::format("⏳ Старт активации", stats.totalActivates, stats.totalUsers));
 
 		value.foreach_array([&](int64_t i, const up::value& v) {
 			auto id = v.at("id").get_string_or_throw();
@@ -154,8 +155,9 @@ int main(int, char**) {
 			uniqueErrors += "\n";
 		}
 
-		bot.getApi().sendMessage(msg->chat->id, fmt::format("Статистика активации: {}/{} \nОшибки:\n{}",
-		                                            stats.totalActivates, stats.totalUsers, uniqueErrors));
+		bot.getApi().sendMessage(msg->chat->id,
+		    fmt::format("{} Статистика активации: {}/{} \n Ошибки:\n{}", stats.errorMsgs.empty() ? "✅" : "⚠️",
+		        stats.totalActivates, stats.totalUsers, uniqueErrors));
 	});
 
 	std::vector<BotCommand::Ptr> commands;

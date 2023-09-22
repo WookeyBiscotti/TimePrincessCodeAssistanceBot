@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <csignal>
 #include <iostream>
+#include <set>
+
 
 inline std::string findToken() {
 	std::string token;

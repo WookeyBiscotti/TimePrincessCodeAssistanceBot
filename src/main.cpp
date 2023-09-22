@@ -92,7 +92,7 @@ int main(int, char**) {
 			return;
 		}
 
-		auto code = msg->text.substr(4);
+		auto code = msg->text.substr(5);
 		code.erase(std::remove_if(code.begin(), code.end(), [](unsigned char x) { return std::isspace(x); }),
 		    code.end());
 

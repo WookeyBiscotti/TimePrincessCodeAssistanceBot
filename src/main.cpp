@@ -11,7 +11,6 @@
 #include <iostream>
 #include <set>
 
-
 inline std::string findToken() {
 	std::string token;
 	std::ifstream tokenFile("token");
@@ -95,7 +94,7 @@ int main(int, char**) {
 		struct Stats {
 			size_t totalUsers = 0;
 			size_t totalActivates = 0;
-			std::string errorMsgs;
+			std::set<std::string> errorMsgs;
 		} stats;
 
 		up::value value = up::vm_fetch_all_records(db).fetch_value_or_throw("iggid");
@@ -133,16 +132,20 @@ int main(int, char**) {
 			if (rc != -1) {
 				stats.totalActivates++;
 			} else {
-				stats.errorMsgs += msg.at("msg");
-				stats.errorMsgs += "\n";
+				stats.errorMsgs.insert(msg.at("msg"));
 			}
 
 			return true;
 		});
 		stats.totalUsers = value.size();
+    std::string uniqueErrors;
+    for(const auto& e: stats.errorMsgs) {
+      uniqueErrors += e;
+      uniqueErrors += "\n";
+    }
 
 		bot.getApi().sendMessage(msg->chat->id, fmt::format("Статистика активации: {}/{} \nОшибки:\n{}",
-		                                            stats.totalActivates, stats.totalUsers, stats.errorMsgs));
+		                                            stats.totalActivates, stats.totalUsers, uniqueErrors));
 	});
 
 	TgLongPoll longPoll(bot);

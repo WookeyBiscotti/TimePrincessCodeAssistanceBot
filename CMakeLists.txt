@@ -5,7 +5,6 @@ project(
   LANGUAGES C CXX)
 
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/3rdparty/tgbot-cpp")
-add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/3rdparty/SQLiteCpp")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/3rdparty/fmt")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/3rdparty/json")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/3rdparty/date")
@@ -33,7 +32,7 @@ target_include_directories(TimePrincessCodeAssistanceBot
 target_include_directories(TimePrincessCodeAssistanceBot PUBLIC "${CMAKE_CURRENT_LIST_DIR}/src")
 
 target_link_libraries(
-  TimePrincessCodeAssistanceBot PUBLIC TgBot SQLiteCpp fmt::fmt nlohmann_json::nlohmann_json
+  TimePrincessCodeAssistanceBot PUBLIC TgBot fmt::fmt nlohmann_json::nlohmann_json
                  date::date unqlite_cpp::unqlite_cpp spdlog::spdlog_header_only)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

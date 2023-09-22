@@ -69,6 +69,11 @@ int main(int, char**) {
 		iggid.erase(std::remove_if(iggid.begin(), iggid.end(), [](unsigned char x) { return std::isspace(x); }),
 		    iggid.end());
 
+		if (iggid.empty()) {
+			bot.getApi().sendMessage(msg->chat->id, "Нельзя добавить пустого пользователя");
+			return;
+		}
+
 		up::vm_store_record(db).store_or_throw("iggid", up::value::object{{"id", iggid}});
 
 		bot.getApi().sendMessage(msg->chat->id, "Пользователь добавлен");
@@ -90,6 +95,11 @@ int main(int, char**) {
 		auto code = msg->text.substr(4);
 		code.erase(std::remove_if(code.begin(), code.end(), [](unsigned char x) { return std::isspace(x); }),
 		    code.end());
+
+		if (code.empty()) {
+			bot.getApi().sendMessage(msg->chat->id, "Нельзя добавить пустой код");
+			return;
+		}
 
 		struct Stats {
 			size_t totalUsers = 0;
@@ -151,7 +161,7 @@ int main(int, char**) {
 	std::vector<BotCommand::Ptr> commands;
 	BotCommand::Ptr cmdArray(new BotCommand);
 	cmdArray->command = "reg";
-	cmdArray->description = "Регистрация нового пользователя, доступног только администратору(/reg 12345678)";
+	cmdArray->description = "Регистрация нового пользователя, доступно только администратору.(/reg 12345678)";
 
 	commands.push_back(cmdArray);
 

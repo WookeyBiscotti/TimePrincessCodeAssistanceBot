@@ -21,3 +21,7 @@
 [submodule "3rdparty/tgbot-cpp"] 
   path = 3rdparty/tgbot-cpp 
   url = https://github.com/reo7sp/tgbot-cpp.git
+
+[submodule "3rdparty/unqlite"] 
+  path = 3rdparty/unqlite
+  url = https://github.com/symisc/unqlite.git

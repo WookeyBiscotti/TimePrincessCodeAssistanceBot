@@ -131,6 +131,11 @@ int main(int, char**) {
 		iggid.erase(std::remove_if(iggid.begin(), iggid.end(), [](unsigned char x) { return std::isspace(x); }),
 		    iggid.end());
 
+		if (iggid.empty()) {
+			bot.getApi().sendMessage(msg->chat->id, "⚠️ Нельзя удалить пустого пользователя!");
+			return;
+		}
+
 		if (eraseIggid(db, iggid)) {
 			bot.getApi().sendMessage(msg->chat->id, "✅ Пользователь удален.");
 		} else {

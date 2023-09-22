@@ -22,6 +22,30 @@ inline std::string findToken() {
 	return token;
 }
 
+bool eraseIggid(up::db& db, const std::string& id) {
+	auto vm = db.compile_or_throw(R"(
+if(db_exists('iggid')){
+  $records = db_fetch_all('iggid', function($rec){
+    if( $rec.id == $id ){
+        return TRUE;
+    }
+    return FALSE;
+  });
+
+  $result = count($records) > 0;
+
+  foreach($records as $rec) {
+    db_drop_record('iggid', $rec.__id);
+  }
+}
+)");
+	vm.bind_or_throw("id", id);
+	vm.exec_or_throw();
+	db.commit_or_throw();
+
+	return vm.extract_or_throw("result").get_bool_or_throw();
+}
+
 const std::set<int64_t> ADMINS = {363372858 /*@Agate_GRim*/, 374655909 /*@biscottti*/};
 
 size_t readStringCallback(void* contents, size_t size, size_t nmemb, void* userp) {
@@ -76,8 +100,42 @@ int main(int, char**) {
 
 		up::vm_store_record(db).store_or_throw("iggid", up::value::object{{"id", iggid}});
 
-		bot.getApi().sendMessage(msg->chat->id, "Пользователь добавлен.");
-		std::cout << "✅ Пользователь добавлен" << std::endl;
+		bot.getApi().sendMessage(msg->chat->id, "✅ Пользователь добавлен.");
+		std::cout << "Пользователь добавлен" << std::endl;
+	});
+
+	bot.getEvents().onCommand("del", [&](TgBot::Message::Ptr msg) {
+		if (!msg->chat) {
+			std::cerr << "Невозможно переслать сообщение" << std::endl;
+			return;
+		}
+
+		if (!msg->from) {
+			bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь!");
+			std::cerr << "Несуществующий пользователь" << std::endl;
+			return;
+		}
+
+		auto userId = msg->from->id;
+		if (ADMINS.count(userId) == 0) {
+			auto m = fmt::format("⚠️ У вас({}({} {}): {}) нет доступа к этой команде!", msg->from->username,
+			    msg->from->firstName, msg->from->lastName, msg->from->id);
+
+			bot.getApi().sendMessage(msg->chat->id, m);
+			std::cout << m << std::endl;
+
+			return;
+		}
+
+		auto iggid = msg->text.substr(4);
+		iggid.erase(std::remove_if(iggid.begin(), iggid.end(), [](unsigned char x) { return std::isspace(x); }),
+		    iggid.end());
+
+		if (eraseIggid(db, iggid)) {
+			bot.getApi().sendMessage(msg->chat->id, "✅ Пользователь удален.");
+		} else {
+			bot.getApi().sendMessage(msg->chat->id, "⚠️ Пользователя не существует.");
+		}
 	});
 
 	bot.getEvents().onCommand("code", [&](TgBot::Message::Ptr msg) {
@@ -172,6 +230,11 @@ int main(int, char**) {
 	cmdArray->description = "Активация кода, доступно всем.(/code ABCDEFG)";
 	commands.push_back(cmdArray);
 
+	cmdArray = BotCommand::Ptr(new BotCommand);
+	cmdArray->command = "del";
+	cmdArray->description = "Удаление пользователя, доступно только администратору.(/del 12345678)";
+	commands.push_back(cmdArray);
+
 	bot.getApi().setMyCommands(commands);
 
 	TgLongPoll longPoll(bot);
@@ -179,6 +242,6 @@ int main(int, char**) {
 		try {
 			printf("Long poll started\n");
 			longPoll.start();
-		} catch (std::exception& e) { printf("error: %s\n", e.what()); }
+		} catch (const std::exception& e) { printf("error: %s\n", e.what()); }
 	}
 }

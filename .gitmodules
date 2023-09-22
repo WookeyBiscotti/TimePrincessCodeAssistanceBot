@@ -25,3 +25,7 @@
 [submodule "3rdparty/unqlite"] 
   path = 3rdparty/unqlite
   url = https://github.com/symisc/unqlite.git
+
+[submodule "3rdparty/unqlite_cpp"] 
+  path = 3rdparty/unqlite_cpp
+  url = https://github.com/WookeyBiscotti/unqlite_cpp.git

@@ -138,15 +138,29 @@ int main(int, char**) {
 			return true;
 		});
 		stats.totalUsers = value.size();
-    std::string uniqueErrors;
-    for(const auto& e: stats.errorMsgs) {
-      uniqueErrors += e;
-      uniqueErrors += "\n";
-    }
+		std::string uniqueErrors;
+		for (const auto& e : stats.errorMsgs) {
+			uniqueErrors += e;
+			uniqueErrors += "\n";
+		}
 
 		bot.getApi().sendMessage(msg->chat->id, fmt::format("Статистика активации: {}/{} \nОшибки:\n{}",
 		                                            stats.totalActivates, stats.totalUsers, uniqueErrors));
 	});
+
+	std::vector<BotCommand::Ptr> commands;
+	BotCommand::Ptr cmdArray(new BotCommand);
+	cmdArray->command = "reg";
+	cmdArray->description = "Регистрация нового пользователя, доступног только администратору(/reg 12345678)";
+
+	commands.push_back(cmdArray);
+
+	cmdArray = BotCommand::Ptr(new BotCommand);
+	cmdArray->command = "code";
+	cmdArray->description = "Активация кода, доступно всем.(/code ABCDEFG)";
+	commands.push_back(cmdArray);
+
+	bot.getApi().setMyCommands(commands);
 
 	TgLongPoll longPoll(bot);
 	while (true) {

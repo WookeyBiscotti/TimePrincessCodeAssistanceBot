@@ -49,14 +49,14 @@ int main(int, char**) {
 		}
 
 		if (!msg->from) {
-			bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь");
+			bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь!");
 			std::cerr << "Несуществующий пользователь" << std::endl;
 			return;
 		}
 
 		auto userId = msg->from->id;
 		if (ADMINS.count(userId) == 0) {
-			auto m = fmt::format("⚠️ У вас({}({} {}): {}) нет доступа к этой команде", msg->from->username,
+			auto m = fmt::format("⚠️ У вас({}({} {}): {}) нет доступа к этой команде!", msg->from->username,
 			    msg->from->firstName, msg->from->lastName, msg->from->id);
 
 			bot.getApi().sendMessage(msg->chat->id, m);
@@ -76,7 +76,7 @@ int main(int, char**) {
 
 		up::vm_store_record(db).store_or_throw("iggid", up::value::object{{"id", iggid}});
 
-		bot.getApi().sendMessage(msg->chat->id, "Пользователь добавлен");
+		bot.getApi().sendMessage(msg->chat->id, "Пользователь добавлен.");
 		std::cout << "✅ Пользователь добавлен" << std::endl;
 	});
 
@@ -87,7 +87,7 @@ int main(int, char**) {
 		}
 
 		if (!msg->from) {
-			bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь");
+			bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь!");
 			std::cerr << "Несуществующий пользователь" << std::endl;
 			return;
 		}
@@ -97,7 +97,7 @@ int main(int, char**) {
 		    code.end());
 
 		if (code.empty()) {
-			bot.getApi().sendMessage(msg->chat->id, "⚠️ Нельзя добавить пустой код!");
+			bot.getApi().sendMessage(msg->chat->id, "⚠️ Нельзя активировать пустой код!");
 			return;
 		}
 
@@ -156,7 +156,7 @@ int main(int, char**) {
 		}
 
 		bot.getApi().sendMessage(msg->chat->id,
-		    fmt::format("{} Статистика активации: {}/{} \n Ошибки:\n{}", stats.errorMsgs.empty() ? "✅" : "⚠️",
+		    fmt::format("{} Статистика активации: {}/{}. \n Ошибки:\n{}", stats.errorMsgs.empty() ? "✅" : "⚠️",
 		        stats.totalActivates, stats.totalUsers, uniqueErrors));
 	});
 

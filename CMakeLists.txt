@@ -4,6 +4,8 @@ project(
   VERSION 0.1.0
   LANGUAGES C CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/3rdparty/tgbot-cpp")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/3rdparty/fmt")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/3rdparty/json")

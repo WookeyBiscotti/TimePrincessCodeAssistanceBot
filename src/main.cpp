@@ -67,160 +67,166 @@ int main(int, char**) {
 	up::db db("db.bin");
 
 	bot.getEvents().onCommand("reg", [&](TgBot::Message::Ptr msg) {
-		if (!msg->chat) {
-			std::cerr << "Невозможно переслать сообщение" << std::endl;
-			return;
-		}
+		try {
+			if (!msg->chat) {
+				std::cerr << "Невозможно переслать сообщение" << std::endl;
+				return;
+			}
 
-		if (!msg->from) {
-			bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь!");
-			std::cerr << "Несуществующий пользователь" << std::endl;
-			return;
-		}
+			if (!msg->from) {
+				bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь!");
+				std::cerr << "Несуществующий пользователь" << std::endl;
+				return;
+			}
 
-		auto userId = msg->from->id;
-		if (ADMINS.count(userId) == 0) {
-			auto m = fmt::format("⚠️ У вас({}({} {}): {}) нет доступа к этой команде!", msg->from->username,
-			    msg->from->firstName, msg->from->lastName, msg->from->id);
+			auto userId = msg->from->id;
+			if (ADMINS.count(userId) == 0) {
+				auto m = fmt::format("⚠️ У вас({}({} {}): {}) нет доступа к этой команде!", msg->from->username,
+				    msg->from->firstName, msg->from->lastName, msg->from->id);
 
-			bot.getApi().sendMessage(msg->chat->id, m);
-			std::cout << m << std::endl;
+				bot.getApi().sendMessage(msg->chat->id, m);
+				std::cout << m << std::endl;
 
-			return;
-		}
+				return;
+			}
 
-		auto iggid = msg->text.substr(4);
-		iggid.erase(std::remove_if(iggid.begin(), iggid.end(), [](unsigned char x) { return std::isspace(x); }),
-		    iggid.end());
+			auto iggid = msg->text.substr(4);
+			iggid.erase(std::remove_if(iggid.begin(), iggid.end(), [](unsigned char x) { return std::isspace(x); }),
+			    iggid.end());
 
-		if (iggid.empty()) {
-			bot.getApi().sendMessage(msg->chat->id, "⚠️ Нельзя добавить пустого пользователя!");
-			return;
-		}
+			if (iggid.empty()) {
+				bot.getApi().sendMessage(msg->chat->id, "⚠️ Нельзя добавить пустого пользователя!");
+				return;
+			}
 
-		up::vm_store_record(db).store_or_throw("iggid", up::value::object{{"id", iggid}});
+			up::vm_store_record(db).store_or_throw("iggid", up::value::object{{"id", iggid}});
 
-		bot.getApi().sendMessage(msg->chat->id, "✅ Пользователь добавлен.");
-		std::cout << "Пользователь добавлен" << std::endl;
+			bot.getApi().sendMessage(msg->chat->id, "✅ Пользователь добавлен.");
+			std::cout << "Пользователь добавлен" << std::endl;
+		} catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
 	});
 
 	bot.getEvents().onCommand("del", [&](TgBot::Message::Ptr msg) {
-		if (!msg->chat) {
-			std::cerr << "Невозможно переслать сообщение" << std::endl;
-			return;
-		}
+		try {
+			if (!msg->chat) {
+				std::cerr << "Невозможно переслать сообщение" << std::endl;
+				return;
+			}
 
-		if (!msg->from) {
-			bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь!");
-			std::cerr << "Несуществующий пользователь" << std::endl;
-			return;
-		}
+			if (!msg->from) {
+				bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь!");
+				std::cerr << "Несуществующий пользователь" << std::endl;
+				return;
+			}
 
-		auto userId = msg->from->id;
-		if (ADMINS.count(userId) == 0) {
-			auto m = fmt::format("⚠️ У вас({}({} {}): {}) нет доступа к этой команде!", msg->from->username,
-			    msg->from->firstName, msg->from->lastName, msg->from->id);
+			auto userId = msg->from->id;
+			if (ADMINS.count(userId) == 0) {
+				auto m = fmt::format("⚠️ У вас({}({} {}): {}) нет доступа к этой команде!", msg->from->username,
+				    msg->from->firstName, msg->from->lastName, msg->from->id);
 
-			bot.getApi().sendMessage(msg->chat->id, m);
-			std::cout << m << std::endl;
+				bot.getApi().sendMessage(msg->chat->id, m);
+				std::cout << m << std::endl;
 
-			return;
-		}
+				return;
+			}
 
-		auto iggid = msg->text.substr(4);
-		iggid.erase(std::remove_if(iggid.begin(), iggid.end(), [](unsigned char x) { return std::isspace(x); }),
-		    iggid.end());
+			auto iggid = msg->text.substr(4);
+			iggid.erase(std::remove_if(iggid.begin(), iggid.end(), [](unsigned char x) { return std::isspace(x); }),
+			    iggid.end());
 
-		if (iggid.empty()) {
-			bot.getApi().sendMessage(msg->chat->id, "⚠️ Нельзя удалить пустого пользователя!");
-			return;
-		}
+			if (iggid.empty()) {
+				bot.getApi().sendMessage(msg->chat->id, "⚠️ Нельзя удалить пустого пользователя!");
+				return;
+			}
 
-		if (eraseIggid(db, iggid)) {
-			bot.getApi().sendMessage(msg->chat->id, "✅ Пользователь удален.");
-		} else {
-			bot.getApi().sendMessage(msg->chat->id, "⚠️ Пользователя не существует.");
-		}
+			if (eraseIggid(db, iggid)) {
+				bot.getApi().sendMessage(msg->chat->id, "✅ Пользователь удален.");
+			} else {
+				bot.getApi().sendMessage(msg->chat->id, "⚠️ Пользователя не существует.");
+			}
+		} catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
 	});
 
 	bot.getEvents().onCommand("code", [&](TgBot::Message::Ptr msg) {
-		if (!msg->chat) {
-			std::cerr << "Невозможно переслать сообщение" << std::endl;
-			return;
-		}
+		try {
+			if (!msg->chat) {
+				std::cerr << "Невозможно переслать сообщение" << std::endl;
+				return;
+			}
 
-		if (!msg->from) {
-			bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь!");
-			std::cerr << "Несуществующий пользователь" << std::endl;
-			return;
-		}
+			if (!msg->from) {
+				bot.getApi().sendMessage(msg->chat->id, "⚠️ Несуществующий пользователь!");
+				std::cerr << "Несуществующий пользователь" << std::endl;
+				return;
+			}
 
-		auto code = msg->text.substr(5);
-		code.erase(std::remove_if(code.begin(), code.end(), [](unsigned char x) { return std::isspace(x); }),
-		    code.end());
+			auto code = msg->text.substr(5);
+			code.erase(std::remove_if(code.begin(), code.end(), [](unsigned char x) { return std::isspace(x); }),
+			    code.end());
 
-		if (code.empty()) {
-			bot.getApi().sendMessage(msg->chat->id, "⚠️ Нельзя активировать пустой код!");
-			return;
-		}
+			if (code.empty()) {
+				bot.getApi().sendMessage(msg->chat->id, "⚠️ Нельзя активировать пустой код!");
+				return;
+			}
 
-		struct Stats {
-			size_t totalUsers = 0;
-			size_t totalActivates = 0;
-			std::set<std::string> errorMsgs;
-		} stats;
+			struct Stats {
+				size_t totalUsers = 0;
+				size_t totalActivates = 0;
+				std::set<std::string> errorMsgs;
+			} stats;
 
-		up::value value = up::vm_fetch_all_records(db).fetch_value_or_throw("iggid");
+			up::value value = up::vm_fetch_all_records(db).fetch_value_or_throw("iggid");
 
-		bot.getApi().sendMessage(msg->chat->id,
-		    fmt::format("⏳ Старт активации", stats.totalActivates, stats.totalUsers));
+			bot.getApi().sendMessage(msg->chat->id,
+			    fmt::format("⏳ Старт активации", stats.totalActivates, stats.totalUsers));
 
-		value.foreach_array([&](int64_t i, const up::value& v) {
-			auto id = v.at("id").get_string_or_throw();
-			using StrPair = std::pair<std::string, std::string>;
-			StrPair userData{id, code};
+			value.foreach_array([&](int64_t i, const up::value& v) {
+				auto id = v.at("id").get_string_or_throw();
+				using StrPair = std::pair<std::string, std::string>;
+				StrPair userData{id, code};
 
-			CURL* handle = curl_easy_init();
-			if (!handle) {
+				CURL* handle = curl_easy_init();
+				if (!handle) {
+					return true;
+				}
+
+				auto data = fmt::format("iggid={}&cdkey={}&username=&sign=0", id, code);
+
+				curl_easy_setopt(handle, CURLOPT_POST, 1);
+				curl_easy_setopt(handle, CURLOPT_URL, "https://dut.igg.com/event/code?lang=rus");
+				curl_easy_setopt(handle, CURLOPT_POSTFIELDS, data.c_str());
+
+				std::string readBuffer;
+				curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, &readStringCallback);
+				curl_easy_setopt(handle, CURLOPT_WRITEDATA, &readBuffer);
+
+				CURLcode res = curl_easy_perform(handle);
+				curl_easy_cleanup(handle);
+
+				if (res != CURLE_OK) {
+					return true;
+				}
+				auto msg = nlohmann::json::parse(readBuffer);
+				int rc = msg.at("code");
+				if (rc != -1) {
+					stats.totalActivates++;
+				} else {
+					stats.errorMsgs.insert(msg.at("msg"));
+				}
+
 				return true;
+			});
+			stats.totalUsers = value.size();
+			std::string uniqueErrors;
+			for (const auto& e : stats.errorMsgs) {
+				uniqueErrors += e;
+				uniqueErrors += "\n";
 			}
 
-			auto data = fmt::format("iggid={}&cdkey={}&username=&sign=0", id, code);
-
-			curl_easy_setopt(handle, CURLOPT_POST, 1);
-			curl_easy_setopt(handle, CURLOPT_URL, "https://dut.igg.com/event/code?lang=rus");
-			curl_easy_setopt(handle, CURLOPT_POSTFIELDS, data.c_str());
-
-			std::string readBuffer;
-			curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, &readStringCallback);
-			curl_easy_setopt(handle, CURLOPT_WRITEDATA, &readBuffer);
-
-			CURLcode res = curl_easy_perform(handle);
-			curl_easy_cleanup(handle);
-
-			if (res != CURLE_OK) {
-				return true;
-			}
-			auto msg = nlohmann::json::parse(readBuffer);
-			int rc = msg.at("code");
-			if (rc != -1) {
-				stats.totalActivates++;
-			} else {
-				stats.errorMsgs.insert(msg.at("msg"));
-			}
-
-			return true;
-		});
-		stats.totalUsers = value.size();
-		std::string uniqueErrors;
-		for (const auto& e : stats.errorMsgs) {
-			uniqueErrors += e;
-			uniqueErrors += "\n";
-		}
-
-		bot.getApi().sendMessage(msg->chat->id,
-		    fmt::format("{} Статистика активации: {}/{}. \n Ошибки:\n{}", stats.errorMsgs.empty() ? "✅" : "⚠️",
-		        stats.totalActivates, stats.totalUsers, uniqueErrors));
+			bot.getApi().sendMessage(msg->chat->id,
+			    fmt::format("{} Статистика активации: {}/{}. \n Ошибки:\n{}", stats.errorMsgs.empty() ? "✅" : "⚠️",
+			        stats.totalActivates, stats.totalUsers, uniqueErrors));
+		} catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
 	});
 
 	std::vector<BotCommand::Ptr> commands;

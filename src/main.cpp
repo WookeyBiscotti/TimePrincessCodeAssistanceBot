@@ -12,6 +12,8 @@
 #include <iostream>
 #include <set>
 
+constexpr size_t MAX_MESSAGE_SIZE = 4096;
+
 inline std::string findToken() {
 	std::string token;
 	std::ifstream tokenFile("token");
@@ -100,6 +102,22 @@ int main(int, char**) {
 			}
 			const auto& iggid = args[1];
 
+			auto users = up::vm_fetch_all_records(db).fetch_or_throw("iggid").make_value();
+
+			bool alreadyCreated = false;
+			users.foreach_array([&iggid, &alreadyCreated](std::size_t, const up::value& v) {
+				if (v.at("id").get_string_or_throw() == iggid) {
+					alreadyCreated = true;
+					return false;
+				}
+				return true;
+			});
+
+			if (alreadyCreated) {
+				bot.getApi().sendMessage(msg->chat->id, "⚠️ Пользователь уже существует!");
+				return;
+			}
+
 			up::vm_store_record(db).store_or_throw("iggid", up::value::object{{"id", iggid}});
 
 			bot.getApi().sendMessage(msg->chat->id, "✅ Пользователь добавлен.");
@@ -180,12 +198,16 @@ int main(int, char**) {
 				return true;
 			});
 
-			auto file = std::make_shared<InputFile>();
-			file->data = users;
-			file->fileName = "users.txt";
-			file->mimeType = "text/plain";
+			if (users.size() >= MAX_MESSAGE_SIZE) {
+				auto file = std::make_shared<InputFile>();
+				file->data = users;
+				file->fileName = "users.txt";
+				file->mimeType = "text/plain";
 
-			bot.getApi().sendDocument(msg->chat->id, file);
+				bot.getApi().sendDocument(msg->chat->id, file);
+			} else {
+				bot.getApi().sendMessage(msg->chat->id, users);
+			}
 		} catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
 	});
 

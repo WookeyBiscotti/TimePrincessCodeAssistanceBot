@@ -15,6 +15,8 @@ add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/3rdparty/spdlog")
 
 add_definitions(-DUNQLITE_CPP_ALLOW_EXCEPTIONS)
 
+find_package(Boost)
+
 set(${CMAKE_CXX_FLAGS} "-I${CMAKE_CURRENT_LIST_DIR}/src")
 
 file(
@@ -35,6 +37,6 @@ target_include_directories(TimePrincessCodeAssistanceBot PUBLIC "${CMAKE_CURRENT
 
 target_link_libraries(
   TimePrincessCodeAssistanceBot PUBLIC TgBot fmt::fmt nlohmann_json::nlohmann_json
-                 date::date unqlite_cpp::unqlite_cpp spdlog::spdlog_header_only)
+                 date::date unqlite_cpp::unqlite_cpp spdlog::spdlog_header_only ${Boost_LIBRARIES})
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

@@ -180,7 +180,12 @@ int main(int, char**) {
 				return true;
 			});
 
-			bot.getApi().sendDocument(msg->chat->id, users);
+			auto file = std::make_shared<InputFile>();
+			file->data = users;
+			file->fileName = "users.txt";
+			file->mimeType = "text/plain";
+
+			bot.getApi().sendDocument(msg->chat->id, file);
 		} catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
 	});
 

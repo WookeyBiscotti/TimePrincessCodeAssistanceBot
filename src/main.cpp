@@ -308,8 +308,7 @@ int main(int, char**) {
 	std::vector<BotCommand::Ptr> commands;
 	BotCommand::Ptr cmdArray(new BotCommand);
 	cmdArray->command = "reg";
-	cmdArray->description = "Регистрация нового пользователя, доступно только администратору.(/reg 12345678)";
-
+	cmdArray->description = "Регистрация нового пользователя.(/reg 12345678 23434566)";
 	commands.push_back(cmdArray);
 
 	cmdArray = BotCommand::Ptr(new BotCommand);
@@ -319,7 +318,12 @@ int main(int, char**) {
 
 	cmdArray = BotCommand::Ptr(new BotCommand);
 	cmdArray->command = "del";
-	cmdArray->description = "Удаление пользователя, доступно только администратору.(/del 12345678)";
+	cmdArray->description = "Удаление пользователя.(/del 12345678)";
+	commands.push_back(cmdArray);
+
+	cmdArray = BotCommand::Ptr(new BotCommand);
+	cmdArray->command = "list";
+	cmdArray->description = "Вывести всех пользователей.(/list)";
 	commands.push_back(cmdArray);
 
 	bot.getApi().setMyCommands(commands);

@@ -96,32 +96,43 @@ int main(int, char**) {
 			std::vector<std::string> args;
 			boost::split(args, msg->text, [](char c) { return c == ' ' || c == '\n' || c == '\t'; });
 
-			if (args.size() != 2) {
+			if (args.size() < 2) {
 				bot.getApi().sendMessage(msg->chat->id, "⚠️ Неверное число аргументов!");
 				return;
 			}
-			const auto& iggid = args[1];
+			args.erase(args.begin());
 
-			auto users = up::vm_fetch_all_records(db).fetch_or_throw("iggid").make_value();
-
-			bool alreadyCreated = false;
-			users.foreach_array([&iggid, &alreadyCreated](std::size_t, const up::value& v) {
-				if (v.at("id").get_string_or_throw() == iggid) {
-					alreadyCreated = true;
-					return false;
-				}
+			std::set<std::string> users;
+			auto usersV = up::vm_fetch_all_records(db).fetch_or_throw("iggid").make_value();
+			usersV.foreach_array([&users](std::size_t, const up::value& v) {
+				users.insert(v.at("id").get_string_or_throw());
 				return true;
 			});
 
-			if (alreadyCreated) {
-				bot.getApi().sendMessage(msg->chat->id, "⚠️ Пользователь уже существует!");
-				return;
+			std::string errorUsers = "⚠️ Пользователи уже существуют:\n";
+			size_t usersAdded = 0;
+			size_t usersTotal = args.size();
+			for (const auto& iggid : args) {
+				try {
+					if (users.count(iggid) != 0) {
+						throw std::runtime_error("User already created!");
+					}
+					up::vm_store_record(db).store_or_throw("iggid", up::value::object{{"id", iggid}});
+					usersAdded++;
+				} catch (const std::exception&) { errorUsers += iggid + "\n"; }
 			}
 
-			up::vm_store_record(db).store_or_throw("iggid", up::value::object{{"id", iggid}});
-
-			bot.getApi().sendMessage(msg->chat->id, "✅ Пользователь добавлен.");
-			std::cout << "Пользователь добавлен" << std::endl;
+			if (usersAdded != 0) {
+				if (usersAdded == usersTotal) {
+					bot.getApi().sendMessage(msg->chat->id,
+					    fmt::format("✅ Пользователи добавленны: {}/{}", usersAdded, usersTotal));
+				} else {
+					bot.getApi().sendMessage(msg->chat->id,
+					    fmt::format("✅ Пользователи добавленны: {}/{}\n{}", usersAdded, usersTotal, errorUsers));
+				}
+			} else {
+				bot.getApi().sendMessage(msg->chat->id, fmt::format("⚠️ Пользователи существуют."));
+			}
 		} catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
 	});
 

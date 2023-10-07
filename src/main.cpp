@@ -269,7 +269,7 @@ int main(int, char**) {
 				auto data = fmt::format("iggid={}&cdkey={}&username=&sign=0", id, code);
 
 				curl_easy_setopt(handle, CURLOPT_POST, 1);
-				curl_easy_setopt(handle, CURLOPT_URL, "https://dut.igg.com/event/code?lang=eng");
+				curl_easy_setopt(handle, CURLOPT_URL, "https://dut.igg.com/event/code?lang=rus");
 				curl_easy_setopt(handle, CURLOPT_POSTFIELDS, data.c_str());
 
 				std::string readBuffer;

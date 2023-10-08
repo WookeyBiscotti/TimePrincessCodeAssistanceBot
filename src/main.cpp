@@ -2,6 +2,8 @@
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
 #include <tgbot/Bot.h>
+// #define HAVE_CURL
+#include <tgbot/net/CurlHttpClient.h>
 #include <tgbot/net/TgLongPoll.h>
 #include <unqlite_cpp/unqlite_cpp.hpp>
 
@@ -63,6 +65,8 @@ int main(int, char**) {
 	});
 
 	using namespace TgBot;
+
+	CurlHttpClient curlHttpClient;
 
 	Bot bot(findToken());
 	bot.getApi().deleteWebhook();
@@ -329,9 +333,9 @@ int main(int, char**) {
 	bot.getApi().setMyCommands(commands);
 
 	TgLongPoll longPoll(bot);
+	printf("Start bot.\n");
 	while (true) {
 		try {
-			printf("Long poll started\n");
 			longPoll.start();
 		} catch (const std::exception& e) { printf("error: %s\n", e.what()); }
 	}

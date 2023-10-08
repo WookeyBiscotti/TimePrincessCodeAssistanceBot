@@ -2,7 +2,6 @@
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
 #include <tgbot/Bot.h>
-// #define HAVE_CURL
 #include <tgbot/net/CurlHttpClient.h>
 #include <tgbot/net/TgLongPoll.h>
 #include <unqlite_cpp/unqlite_cpp.hpp>
@@ -68,7 +67,7 @@ int main(int, char**) {
 
 	CurlHttpClient curlHttpClient;
 
-	Bot bot(findToken());
+	Bot bot(findToken(), curlHttpClient);
 	bot.getApi().deleteWebhook();
 
 	up::db db("db.bin");

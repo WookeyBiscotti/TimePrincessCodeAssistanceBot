@@ -30,6 +30,7 @@ inline std::string findToken() {
 
 bool eraseIggid(up::db& db, const std::string& id) {
 	auto vm = db.compile_or_throw(R"(
+$result = FALSE;
 if(db_exists('iggid')){
   $records = db_fetch_all('iggid', function($rec){
     if( $rec.id == $id ){
@@ -54,6 +55,7 @@ if(db_exists('iggid')){
 
 bool eraseSubAdmin(up::db& db, int64_t id) {
 	auto vm = db.compile_or_throw(R"(
+$result = FALSE;
 if(db_exists('sub_admins')){
   $records = db_fetch_all('sub_admins', function($rec){
     if( $rec.id == $id ){
@@ -67,7 +69,6 @@ if(db_exists('sub_admins')){
   foreach($records as $rec) {
     db_drop_record('sub_admins', $rec.__id);
   }
-  $result = FALSE;
 }
 )");
 	vm.bind_or_throw("id", id);

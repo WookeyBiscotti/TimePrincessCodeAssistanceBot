@@ -38,6 +38,6 @@ target_include_directories(TimePrincessCodeAssistanceBot PUBLIC "${CMAKE_CURRENT
 
 target_link_libraries(
   TimePrincessCodeAssistanceBot PUBLIC TgBot fmt::fmt nlohmann_json::nlohmann_json
-                 date::date unqlite_cpp::unqlite_cpp spdlog::spdlog_header_only ${Boost_LIBRARIES})
+                 date::date unqlite_cpp::unqlite_cpp spdlog::spdlog_header_only ${Boost_LIBRARIES} curl)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

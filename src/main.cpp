@@ -67,6 +67,7 @@ if(db_exists('sub_admins')){
   foreach($records as $rec) {
     db_drop_record('sub_admins', $rec.__id);
   }
+  $result = FALSE;
 }
 )");
 	vm.bind_or_throw("id", id);
@@ -113,7 +114,6 @@ int main(int, char**) {
 	});
 
 	auto logCmd = spdlog::rotating_logger_st("log_cmd", "log_cmd.log", 50 * 1024 * 1024, 20);
-	// logCmd->set_level(spdlog::level::info);
 	logCmd->flush_on(spdlog::level::info);
 	auto logMsg = [&](const TgBot::Message::Ptr& msg) {
 		logCmd->info("'{}'({} {}, id: {}): {}", msg->from->username, msg->from->firstName, msg->from->lastName,
@@ -134,7 +134,7 @@ int main(int, char**) {
 
 	loadSubAdmins(db);
 
-	bot.getEvents().onCommand("admin_del", [&](TgBot::Message::Ptr msg) {
+	bot.getEvents().onCommand("admin_add", [&](TgBot::Message::Ptr msg) {
 		try {
 			if (!msg->chat) {
 				std::cerr << "Невозможно переслать сообщение" << std::endl;
@@ -177,7 +177,7 @@ int main(int, char**) {
 			bot.getApi().sendMessage(msg->chat->id, fmt::format("⚠️ {}", e.what()));
 		}
 	});
-	bot.getEvents().onCommand("admin_add", [&](TgBot::Message::Ptr msg) {
+	bot.getEvents().onCommand("admin_del", [&](TgBot::Message::Ptr msg) {
 		try {
 			if (!msg->chat) {
 				std::cerr << "Невозможно переслать сообщение" << std::endl;
